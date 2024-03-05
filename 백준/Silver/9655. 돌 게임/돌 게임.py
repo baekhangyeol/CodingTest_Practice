@@ -1,18 +1,15 @@
-import sys
-input = sys.stdin.readline
+def find_winner(N):
+    dp = [False] * (N + 1)
 
-n = int(input())
+    dp[1] = True
+    if N > 1:
+        dp[2] = False
+    if N > 2:
+        dp[3] = True
 
-dp = [-1] * 1001
+    for i in range(4, N + 1):
+        dp[i] = not dp[i - 1] or not dp[i - 3]
 
-dp[1] = 1
-dp[2] = 0
-dp[3] = 1
+    return 'SK' if dp[N] else 'CY'
 
-for i in range(4, n+1):
-    if dp[i-1] or dp[i-3]:
-        dp[i] = 0
-    else:
-        dp[1] = 1
-        
-print("CY" if dp[n] == 0 else "SK")
+print(find_winner(int(input())))
