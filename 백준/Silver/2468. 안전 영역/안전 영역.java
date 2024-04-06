@@ -1,60 +1,52 @@
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.Scanner;
 
 public class Main {
-
-    private static int[][] grid;
-    private static boolean[][] visited;
-    private static final int[] dx = {-1, 1, 0, 0};
-    private static final int[] dy = {0, 0, -1, 1};
-
+    static int[][] area;
+    static boolean[] visited;
+    static int[] dx = {-1, 1, 0, 0};
+    static int[] dy = {0, 0, -1, 1};
+    static int N;
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        int N = sc.nextInt();
-        grid = new int[N][N];
+        N = sc.nextInt();
+        area = new int[N][N];
 
-        int max = 0;
+        int maxHeight = 0;
         for(int i=0; i<N; i++) {
             for(int j=0; j<N; j++) {
-                grid[i][j] = sc.nextInt();
-                max = Math.max(max, grid[i][j]);
+                area[i][j] = sc.nextInt();
+                maxHeight = Math.max(maxHeight, area[i][j]);
             }
         }
-        int result = 1;
 
-        for(int waterLevel=1; waterLevel<max; waterLevel++) {
-            visited = new boolean[N][N];
-            int cnt = 0;
+        int maxSafeAreas = 0;
+        for(int height = 0; height<= maxHeight; height++) {
+            visited = new boolean[N*N];
+            int safeAreas = 0;
+
             for(int i=0; i<N; i++) {
                 for(int j=0; j<N; j++) {
-                    if(grid[i][j] > waterLevel && !visited[i][j]) {
-                        bfs(i, j, waterLevel, N);
-                        cnt++;
+                    if(area[i][j] > height && !visited[i*N+j]) {
+                        dfs(i, j, height);
+                        safeAreas++;
                     }
                 }
             }
-            result = Math.max(result, cnt);
+            maxSafeAreas = Math.max(maxSafeAreas, safeAreas);
         }
-        System.out.println(result);
+        System.out.println(maxSafeAreas);
     }
 
-    private static void bfs(int x, int y, int waterLevel, int N) {
-        Queue<int[]> queue = new LinkedList<>();
-        queue.offer(new int[]{x, y});
-        visited[x][y] = true;
+    static void dfs(int x, int y, int height) {
+        visited[x*N+y] = true;
 
-        while(!queue.isEmpty()) {
-            int[] current = queue.poll();
-            int curX = current[0];
-            int curY = current[1];
+        for(int i=0; i<4; i++) {
+            int nx = x + dx[i];
+            int ny = y + dy[i];
 
-            for(int i=0; i<4; i++) {
-                int nextX = curX + dx[i];
-                int nextY = curY + dy[i];
-                if(nextX>=0 && nextX<N && nextY>=0 && nextY<N && grid[nextX][nextY] > waterLevel && !visited[nextX][nextY]) {
-                    queue.offer(new int[]{nextX, nextY});
-                    visited[nextX][nextY] = true;
+            if(nx >= 0 && ny >= 0 && nx < N && ny < N) {
+                if(area[nx][ny] > height && !visited[nx*N+ny]) {
+                    dfs(nx, ny, height);
                 }
             }
         }
