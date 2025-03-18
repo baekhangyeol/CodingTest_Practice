@@ -1,22 +1,30 @@
+import heapq
+
 def solution(book_time):
-    books = []
 
-    for start, end in book_time:
-        books.append((hour_to_minutes(start), 1))
-        books.append((hour_to_minutes(end) + 10, -1))
+    book_time.sort()
 
-    books.sort()
+    start = []
+    end = []
 
-    current_rooms = 0
-    needed_rooms = 0
+    for time in book_time:
+        start.append(hourToMinute(time[0]))
+        end.append(hourToMinute(time[1]) + 10)
 
-    for time, type in books:
-        current_rooms += type
-        needed_rooms = max(needed_rooms, current_rooms)
+    rooms = []
+    heapq.heapify(rooms)
 
-    return needed_rooms
+    for i in range(len(book_time)):
+        if rooms and rooms[0] <= start[i]:
+            heapq.heappop(rooms)
 
+        heapq.heappush(rooms, end[i])
 
-def hour_to_minutes(time):
-    hour, minute = map(int, time.split(":"))
-    return hour * 60 + minute
+    return len(rooms)
+
+def hourToMinute(time):
+    hour, minute = time.split(":")
+
+    minutes = int(hour) * 60 + int(minute)
+
+    return minutes
